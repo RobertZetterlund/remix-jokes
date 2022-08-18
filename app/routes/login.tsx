@@ -1,10 +1,9 @@
 import type { ActionFunction, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { createUserSession, login } from "~/utils/session.server";
-
-import { useActionData, Link, useSearchParams } from "@remix-run/react";
+import { useActionData, useSearchParams, Link } from "@remix-run/react";
 
 import { db } from "~/utils/db.server";
+import { createUserSession, login, register } from "~/utils/session.server";
 import stylesUrl from "~/styles/login.css";
 
 export const links: LinksFunction = () => {
@@ -24,7 +23,6 @@ function validatePassword(password: unknown) {
 }
 
 function validateUrl(url: any) {
-  console.log(url);
   let urls = ["/jokes", "/", "https://remix.run"];
   if (urls.includes(url)) {
     return url;
@@ -75,14 +73,12 @@ export const action: ActionFunction = async ({ request }) => {
   switch (loginType) {
     case "login": {
       const user = await login({ username, password });
-      console.log({ user });
       if (!user) {
         return badRequest({
           fields,
-          formError: `Username/Password conmbination is incorrect`,
+          formError: `Username/Password combination is incorrect`,
         });
       }
-      // if there is a user, create their session and redirect to /jokes
       return createUserSession(user.id, redirectTo);
     }
     case "register": {
@@ -95,12 +91,14 @@ export const action: ActionFunction = async ({ request }) => {
           formError: `User with username ${username} already exists`,
         });
       }
-      // create the user
-      // create their session and redirect to /jokes
-      return badRequest({
-        fields,
-        formError: "Not implemented",
-      });
+      const user = await register({ username, password });
+      if (!user) {
+        return badRequest({
+          fields,
+          formError: `Something went wrong trying to create a new user.`,
+        });
+      }
+      return createUserSession(user.id, redirectTo);
     }
     default: {
       return badRequest({
