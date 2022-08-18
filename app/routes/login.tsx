@@ -1,4 +1,8 @@
-import type { ActionFunction, LinksFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LinksFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useSearchParams, Link } from "@remix-run/react";
 
@@ -8,6 +12,13 @@ import stylesUrl from "~/styles/login.css";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: stylesUrl }];
+};
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "Remix Jokes | Login",
+    description: "Login to submit your own jokes to Remix Jokes!",
+  };
 };
 
 function validateUsername(username: unknown) {
@@ -112,7 +123,6 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Login() {
   const actionData = useActionData<ActionData>();
   const [searchParams] = useSearchParams();
-
   return (
     <div className="container">
       <div className="content" data-light="">
