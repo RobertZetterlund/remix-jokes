@@ -112,6 +112,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Login() {
   const actionData = useActionData<ActionData>();
   const [searchParams] = useSearchParams();
+
   return (
     <div className="container">
       <div className="content" data-light="">
